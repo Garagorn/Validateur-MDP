@@ -19,17 +19,13 @@ def apply_dark_theme(root):
 
     style.configure(".", background=bg, foreground=fg)
 
-    style.configure("TLabel",
-        background=bg,
-        foreground=fg,
-        font=("Segoe UI", 10)
-    )
+    style.configure("TLabel", background=bg, foreground=fg)
+    style.configure("TFrame", background=bg)
 
     style.configure("TEntry",
         fieldbackground=entry_bg,
         foreground=fg,
-        insertcolor=fg,
-        padding=5
+        insertcolor=fg
     )
 
     style.map("TEntry",
@@ -38,17 +34,29 @@ def apply_dark_theme(root):
 
     style.configure("TButton",
         background=accent,
-        foreground="white",
-        padding=6
+        foreground="white"
+    )
+
+    style.configure("Horizontal.TProgressbar",
+        troughcolor="#2a2a2a",
+        background=accent
+    )
+
+    style.configure("TNotebook", background=bg)
+    style.configure("TNotebook.Tab",
+        background="#cccccc",
+        foreground="black"
+    )
+    style.map("TNotebook.Tab",
+        background=[("selected", accent)],
+        foreground=[("selected", "white")]
     )
 
     root.configure(bg=bg)
 
 
-#Lancement de la version graphique
 def lancer():
 
-    # Barres de progression
     root = tk.Tk()
     root.title("Analyseur de mot de passe")
     root.geometry("900x750")
@@ -59,11 +67,11 @@ def lancer():
     notebook.pack(fill="both", expand=True)
 
 
-    #Création de mot de passe - - -
+    # Creation
+
     frame = ttk.Frame(notebook, padding=20)
     notebook.add(frame, text="Création")
 
-    # Champs
     entry_username = ttk.Entry(frame)
     entry_nom = ttk.Entry(frame)
     entry_prenom = ttk.Entry(frame)
@@ -79,7 +87,7 @@ def lancer():
 
     frame.columnconfigure(1, weight=1)
 
-    # Barres de progression 
+
 
     def update_bar(canvas, value, max_value):
         canvas.delete("bar")
@@ -98,7 +106,7 @@ def lancer():
 
     def add_bar(row, text):
         ttk.Label(frame, text=text).grid(row=row, column=0, sticky="w")
-        bar = tk.Canvas(frame,height=22,bg="#2a2a2a",highlightthickness=0)
+        bar = tk.Canvas(frame, height=20, bg="#2a2a2a", highlightthickness=0)
         bar.grid(row=row, column=1, sticky="ew", pady=4)
         return bar
 
@@ -108,7 +116,7 @@ def lancer():
     bar_spec = add_bar(8, "Spéciaux")
 
 
-    # Analyse du mot de passe
+
     def analyser(event=None):
         password = entry_mdp.get()
         nom = entry_nom.get()
@@ -116,17 +124,21 @@ def lancer():
         naissance = entry_naissance.get()
 
         if not password:
+            text_feedback.delete("1.0", tk.END)
+            label_score.config(text="Score :")
+            progress["value"] = 0
             return
 
         infos = [nom, prenom, naissance]
+
         score_struct, stats = score_structure(password)
 
         try:
             zx = verification_dictionnaire(password, infos)
             zx_score = score_zxcvbn(zx)
-        except:
-            zx_score = 0
+        except Exception:
             zx = {"feedback": {"suggestions": []}}
+            zx_score = 0
 
         date_fragments = analyser_date_naissance(password, naissance)
 
@@ -139,26 +151,22 @@ def lancer():
         if issues:
             score_total = min(score_total, 40)
 
+        # UI score
         progress["value"] = score_total
 
-        # Couleur dynamique
         if score_total < 40:
-            color = "red"
+            color = "#d9534f"
         elif score_total < 75:
-            color = "orange"
+            color = "#f0ad4e"
         else:
-            color = "green"
+            color = "#5cb85c"
 
         label_score.config(
             text=f"Score : {score_total} / 100 ({niveau(score_total)})",
             foreground=color
         )
 
-        # Activation bouton ajouter
-        if est_valide(score_total):
-            btn_ajouter.config(state="normal")
-        else:
-            btn_ajouter.config(state="disabled")
+        btn_ajouter.config(state="normal" if est_valide(score_total) else "disabled")
 
         # Barres
         update_bar(bar_maj, stats["Majuscules"], 2)
@@ -173,21 +181,23 @@ def lancer():
         for msg in messages:
             text_feedback.insert(tk.END, f"• {msg}\n")
 
+
     entry_mdp.bind("<KeyRelease>", analyser)
 
+
     def ajouter():
-        username = entry_username.get()
-        password = entry_mdp.get()
+        success, message = ajouterMDP(
+            entry_username.get(),
+            entry_mdp.get()
+        )
 
-        success, message = ajouterMDP(username, password)
-
-        if success:
-            label_info.config(text=message, foreground="green")
-        else:
-            label_info.config(text=message, foreground="red")
+        label_info.config(
+            text=message,
+            foreground="#5cb85c" if success else "#d9534f"
+        )
 
 
-    #UI
+    # UI
 
     btn_ajouter = ttk.Button(frame, text="Ajouter", command=ajouter, state="disabled")
     btn_ajouter.grid(row=9, column=1, pady=10)
@@ -201,9 +211,19 @@ def lancer():
     label_info = ttk.Label(frame, text="")
     label_info.grid(row=12, column=0, columnspan=2)
 
-    text_feedback = tk.Text(frame,height=12,bg="#2a2a2a",fg="#ffffff",insertbackground="white",relief="flat")
+    text_feedback = tk.Text(
+        frame,
+        height=12,
+        bg="#2a2a2a",
+        fg="#ffffff",
+        insertbackground="white"
+    )
+    text_feedback.grid(row=13, column=0, columnspan=2, sticky="nsew")
 
     frame.rowconfigure(13, weight=1)
+
+
+    # Connexion
 
     frame_login = ttk.Frame(notebook, padding=20)
     notebook.add(frame_login, text="Connexion")
@@ -230,12 +250,11 @@ def lancer():
             login_pass.get()
         )
 
-        if success:
-            label_login.config(text=message, foreground="#5cb85c")
-        else:
-            label_login.config(text=message, foreground="#d9534f")
+        label_login.config(
+            text=message,
+            foreground="#5cb85c" if success else "#d9534f"
+        )
 
-    ttk.Button(container, text="Se connecter", command=verifier)\
-        .pack(pady=10)
+    ttk.Button(container, text="Se connecter", command=verifier).pack(pady=10)
 
     root.mainloop()
