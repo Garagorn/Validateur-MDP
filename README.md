@@ -99,7 +99,7 @@ Voici les parties composant ce projet
 
 ![Connexion correcte](Images/ConnexionCorrecte.png)
 
-## Vérification échouée
+## Echec de la vérification
 
 ![Connexion incorrecte](Images/ConnexionIncorrecte.png)
 
