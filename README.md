@@ -164,7 +164,7 @@ Utilisation de argon2 pour hashé et vérifier
 - chiffrement de la base de données
 - amélioration du scoring des mots de passe
 
-[Pouvoir utiliser ce vérificateur dans un environnement client serveur sécurisé](https://github.com/Garagorn/VerificateurMotDePasse_Client_Serveur))
+[Pouvoir utiliser ce vérificateur dans un environnement client serveur sécurisé](https://github.com/Garagorn/VerificateurMotDePasse_Client_Serveur)
 
 ---
 # Auteur
