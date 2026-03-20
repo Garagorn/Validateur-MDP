@@ -153,7 +153,7 @@ Utilisation de zxcvbn et getpass
 Utilisation de SQLlite avec python
 -> https://compucademy.net/user-login-with-python-and-sqlite/
 
-https://pypi.org/project/argon2-cffi/
+Utilisation de argon2 pour hashé et vérifier 
 -> https://argon2-cffi.readthedocs.io/en/stable/
 
 ---
