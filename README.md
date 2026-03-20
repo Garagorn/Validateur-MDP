@@ -148,7 +148,9 @@ Le projet met en œuvre plusieurs bonnes pratiques :
 J'ai notamment utiliser les ressources suivantes pour le projet :
 
 [Utilisation de zxcvbn et getpass](https://thepythoncode.com/article/test-password-strength-with-python)
+
 [Utilisation de SQLlite avec python](https://compucademy.net/user-login-with-python-and-sqlite/)
+
 [https://pypi.org/project/argon2-cffi/](https://argon2-cffi.readthedocs.io/en/stable/)
 
 ---
